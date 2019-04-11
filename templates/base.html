@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>个人博客</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bbs.css">
+    <link rel="stylesheet" href="/static/css/blog.css">
+{#    <link rel="stylesheet" href="/static/theme/{{ blog.theme }}">#}
+</head>
+<body>
+{% csrf_token %}
+<!--导航栏开始-->
+{#<div class="head"></div>#}
+<nav class="navbar navbar-info" >
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">博客园</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">首页<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">新随笔</a></li>
+                <li><a href="#">联系</a></li>
+                <li><a href="#">管理</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#">{{ user.username }}</a>
+                </li>
+                <li>
+                    <img src="/media/{{ user.avatar }}" alt=""
+                         style="height: 50px;width: 50px;border-radius: 50%">
+                </li>
+                <li><a href="/logout1/">注销</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <!-- 左侧侧边栏 开始 -->
+        <div class="col-md-2">
+            {% load s12 %}
+            {% left_menu username %}
+        </div>
+        <!-- 左侧侧边栏 结束 -->
+        <!-- 右侧文章列表 开始 -->
+        <div class="col-md-10">
+            {% block page-main %}
+            {% endblock page-main %}
+        </div>
+        <!-- 右侧文章列表 结束 -->
+    </div>
+</div>
+<!-- 点赞功能-->
+<script src="/static/js/jquery.js"></script>
+<script src="/static/bootstrap-3.3.7/js/bootstrap.js"></script>
+{% block page-js %}
+
+{% endblock %}
+</body>
+</html>

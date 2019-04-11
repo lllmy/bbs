@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>个人博客</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bbs.css">
+</head>
+<body>
+<!--导航栏开始-->
+<nav class="navbar navbar-info navbar-fixed">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">博客园</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">首页<span class="sr-only">(current)</span></a></li>
+                <li><a href="#">新随笔</a></li>
+                <li><a href="#">联系</a></li>
+                <li><a href="#">管理</a></li>
+
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#">{{ user_obj.username}}</a>
+                </li>
+                <li>
+                    <img src="/media/{{ user_obj.avatar }}" alt=""
+                         style="height: 50px;width: 50px;border-radius: 50%">
+                </li>
+                <li><a href="/logout1/">注销</a></li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<!--导航栏结束-->
+<!--内容开始-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">我的标签</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                        {% for tag in tag_list %}
+                            <li class="list-group-item">{{ tag.title }}({{ tag.article2tag_set.count }})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+
+            </div>
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">文章分类</h3>
+                    <ul class="list-group" style="padding-top: 20px">
+                        {% for cart in cart_list %}
+                            <li class="list-group-item">{{ cart.title }}({{cart.article_set.count}})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">日期归档</h3>
+                    <ul class="list-group" style="padding-top: 20px">
+                        {% for dates in date_list %}
+                            <li class="list-group-item">{{ dates.create_time|date:'Y-m' }}({{dates.}})</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-10">
+
+            <div class="article-list ">
+                {% for article in article_list %}
+                    <!-- 文章 开始-->
+                    <div class="article">
+                        <div class="media ">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <h2 class="media-heading" style="text-align: center">{{ article.title }}</h2>
+                                </div>
+                            </div>
+                            <div class="media-body">
+                                <div class="article-desc">
+                                    {{ article.desc }}
+                                    <a href="{{ article.articledetail.content }}">阅读全文</a>
+                                </div>
+                                <div class="article-footer">
+                                    <a href="">{{ article.user.username }}</a>
+                                    <span>发布于&nbsp;{{ article.create_time|date:'Y-m-d H:i:s' }}</span>
+                                    <span class="glyphicon glyphicon-comment">评论({{ article.comment_count }})</span>
+                                    <span class="glyphicon glyphicon-thumbs-up">点赞({{ article.up_count }})</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 文章 结束-->
+
+                {% endfor %}
+            </div>
+
+            <!-- 分页 开始-->
+            {{ page_html|safe }}
+            <!-- 分页 结束-->
+        </div>
+    </div>
+</div>
+<!--内容-->
+</body>
+</html>

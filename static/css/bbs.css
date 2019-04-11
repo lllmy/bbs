@@ -1,0 +1,23 @@
+.login-form {
+    margin-top: 70px;
+}
+.err-text {
+    color: red;
+}
+/*博客首页样式区*/
+.article {
+    margin-bottom: 20px;
+}
+.author-avatar {
+    height: 80px;
+    width: 80px;
+}
+.article-footer {
+    margin-top: 5px;
+}
+.article-footer span {
+    margin-right: 15px;
+}
+.article-footer span:first-child {
+    margin-right: 5px;
+}

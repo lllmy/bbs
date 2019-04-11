@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎登录</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bbs.css">
+</head>
+<body>
+{% csrf_token %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="{{ form_obj.username.id_for_label }}">{{ form_obj.username.label }}</label>
+                    {{ form_obj.username }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form_obj.password.id_for_label }}">{{ form_obj.password.label }}</label>
+                    {{ form_obj.password }}
+                </div>
+{#                <div class="form-group">#}
+{#                    <label for="v-code" style="display: block;">验证码</label>#}
+{#                    <input type="text" id="v-code" class="form-control" style="width: 250px;display: inline-block">#}
+{#                    <img  id="i1" style="float: right">#}
+{#                </div>#}
+                <p id="error-p" class="err-text"></p>
+                <button id="login-btn" type="button" class="btn btn-default">登录</button>
+                <div id="popup-captcha"></div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/js/jquery.js"></script>
+<!-- 引入封装了failback的接口--initGeetest -->
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+<script>
+    var handlerPopup = function (captchaObj) {
+
+        // 成功的回调
+        captchaObj.onSuccess(function () {
+            var validate = captchaObj.getValidate();
+            $.ajax({
+                url: "/login2/", // 进行二次验证
+                type: "post",
+                data: {
+                    username: $("#id_username").val(),
+                    password: $("#id_password").val(),
+                    csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val(),
+                    geetest_challenge: validate.geetest_challenge,
+                    geetest_validate: validate.geetest_validate,
+                    geetest_seccode: validate.geetest_seccode
+                },
+                success: function (res) {  // 验证码验证成功之后
+                    console.log(res);
+                    if (res.code !== 0) {
+                        // 有错误
+                        $("#error-p").text(res.msg);
+                    } else {
+                        location.href = '/index/'
+                    }
+                }
+            });
+        });
+        // 点击哪个按钮弹出滑动验证码
+        $("#login-btn").click(function () {
+            captchaObj.show();
+        });
+        // 将验证码加到id为captcha的元素里
+        captchaObj.appendTo("#popup-captcha");
+        // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+    };
+    // 验证开始需要向网站主后台获取id，challenge，success（是否启用failback）
+    $.ajax({
+        url: "/pcgetcaptcha?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                product: "popup", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+                // 更多配置参数请参见：http://www.geetest.com/install/sections/idx-client-sdk.html#config
+            }, handlerPopup);
+        }
+    });
+</script>
+<script>
+    $("input").focus(function () {
+        $("#error-p").text('');
+    });
+    // 点击刷新验证码
+    $("#i1").click(function () {
+        // this.src += "?";
+        // 使用正则判断一下：如果原来的url有?就去掉，没有就加上
+        var url = this.src;
+        if (/\?$/.test(url)) {
+            // 去掉最后的?
+            this.src = url.slice(0, -1);
+        } else {
+            this.src = url + "?";
+        }
+        console.log(this.src);
+    })
+</script>
+</body>
+</html>

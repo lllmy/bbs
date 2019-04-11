@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>增加文章</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form action="" method="post">
+            {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">文章标题</label>
+                    <input type="text" class="form-control" name="title" id="title" placeholder="文章标题">
+                </div>
+                <div class="form-group">
+                    <label for="content">文章内容</label>
+                    <textarea class="form-control" name="content" id="content" cols="30" rows="20"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">文章分类</label>
+                    <br>
+                    {% for category in category_list %}
+                        <label class="checkbox-inline" for="category">
+                            <input type="checkbox" name="category" value={{ category.id }}>
+                            {{ category.title }}
+                        </label>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label for="tag">文章标签</label>
+                    <br>
+                    {% for tag in tag_list %}
+                        <label class="checkbox-inline" for="tag">
+                            <input type="checkbox" name="tag" value={{ tag.id }}>
+                            {{ tag.title }}
+                        </label>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-info">发布</button>
+            </form>
+        </div>
+    </div>
+</div>
+{#这是富文本插件用到的kindeditor插件，又因为提交要用到csrftoken,所以导入jquery#}
+<script charset="utf-8" src="/static/plugins/kindeditor/kindeditor-all.js"></script>
+<script charset="utf-8" src="/static/plugins/kindeditor/lang/zh-CN.js"></script>
+<script src="/static/js/jquery.js"></script>
+<script>
+        KindEditor.ready(function(K) {
+                window.editor = K.create('#content', {
+                    "uploadJson": "/blog/upload/",
+                    "extraFileUploadParams": {"csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val()}
+                });
+        });
+</script>
+</body>
+</html>

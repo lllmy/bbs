@@ -1,0 +1,95 @@
+* {
+    margin: 0;
+}
+.head {
+    height: 50px;
+    width: 100%;
+    background: greenyellow;
+    margin-bottom: 20px;
+}
+
+/*博客站点样式区*/
+.article {
+    margin-bottom: 20px;
+}
+.author-avatar {
+    height: 80px;
+    width: 80px;
+}
+.article-footer {
+    margin-top: 5px;
+}
+.article-footer span {
+    margin-right: 15px;
+}
+.article-footer span:first-child {
+    margin-right: 5px;
+}
+
+/* 点赞 样式区*/
+.clear {
+    clear: both;
+}
+
+#div_digg {
+    float: right;
+    margin-bottom: 10px;
+    margin-right: 30px;
+    font-size: 12px;
+    width: 125px;
+    text-align: center;
+    margin-top: 10px
+}
+
+.diggit {
+    float: left;
+    width: 46px;
+    height: 52px;
+    background: url('/static/images/upup.gif') no-repeat;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 2px;
+    padding-top: 5px
+}
+
+.diggnum {
+    font-size: 14px;
+    color: #075db3;
+}
+
+.buryit {
+    float: right;
+    margin-left: 20px;
+    width: 46px;
+    height: 52px;
+    background: url('/static/images/downdown.gif') no-repeat;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 2px;
+    padding-top: 5px
+}
+
+.burynum {
+    font-size: 14px;
+    color: #075db3;
+}
+
+.diggword {
+    margin-top: 5px;
+    margin-left: 0;
+    font-size: 12px;
+    color: red;
+}
+/*文章详情页 评论区样式*/
+.comment-header {
+    border-bottom: 1px dotted rgb(204,204,204);
+}
+.comment-header>span {
+    margin-right: 15px;
+}
+.comment-content {
+    padding: 15px 0;
+}
+.list-group-item-text {
+    margin: 0;
+}

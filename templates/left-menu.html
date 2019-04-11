@@ -1,0 +1,43 @@
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title">文章分类</h3>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            {% for category in category_list %}
+                <li class="list-group-item"><a
+                        href="/blog/{{ username }}/category/{{ category.title }}/">{{ category.title }}({{ category.article_set.all.count }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title">文章标签</h3>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group" style="padding-top: 20px">
+            {% for tag in tag_list %}
+                <li class="list-group-item"><a
+                        href="/blog/{{ username }}/tag/{{ tag.title }}/">{{ tag.title }}({{ tag.article_set.all.count }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="panel panel-warning">
+    <div class="panel-heading">
+        <h3 class="panel-title">日期归档</h3>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group" style="padding-top: 20px">
+            {% for archive in archive_list %}
+                <li class="list-group-item"><a
+                        href="/blog/{{ username }}/archive/{{ archive.y_m }}/">{{ archive.y_m }}({{ archive.c }})</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

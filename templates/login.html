@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bbs.css">
+    <script src="/static/js/jquery.js"></script>
+</head>
+<body>
+{% csrf_token %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="{{form_obj.username.id_for_label}}">{{form_obj.username.label}}</label>
+                    {{form_obj.username}}
+                </div>
+                <div class="form-group">
+                    <label for="{{form_obj.password.id_for_label}}">{{form_obj.password.label}}</label>
+                    {{form_obj.password}}
+                </div>
+                <div class="form-group">
+                    <label for="v-code" style="display: block;">验证码</label>
+                    <input type="text" id="v-code" class="form-control" style="width: 250px;display: inline-block">
+                    <img src="/v-code/" id="i1" style="float: right">
+                </div>
+                <p id="error-p" class="err-text"></p>
+                <button id="login-btn" type="button" class="btn btn-default">登录</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $("#login-btn").click(function () {
+        //先获取数据
+        let username = $("#id_username").val();
+        let pwd = $("#id_password").val();
+        let csrfToken = $("[name='csrfmiddlewaretoken']").val();
+        let vCode = $("#v-code").val();
+        //发送ajax
+        $.ajax({
+            url:'/login/',
+            type:'post',
+            data:{
+                username:username,
+                password:pwd,
+                csrfmiddlewaretoken:csrfToken,
+                v_code:vCode,
+            },
+            success:function (res) {
+                console.log(res);
+                if (res.code !== 0){
+                    $("#error-p").text(res.msg);
+                }else{
+                    location.href = '/index/'
+                }
+            }
+        })
+    });
+    //获取焦点，让错误信息消失
+    $("input").focus(function () {
+        $("#error-p").text('');
+    });
+    //让验证码不刷新页面的同时，也能够换验证码
+    $("#i1").click(function () {
+        // this.src += "?";
+        // 使用正则判断一下：如果原来的url有?就去掉，没有就加上
+        var url = this.src;
+        if (/\?$/.test(url)){
+            // 去掉最后的?
+            this.src = url.slice(0,-1);
+        }else {
+            this.src = url + "?";
+        }
+        console.log(this.src);
+    })
+</script>
+</body>
+</html>
+
+
+

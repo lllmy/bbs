@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block page-main %}
+    <div class="article-content">
+        <h1>{{ article.title }}</h1>
+        <p>{{ article.articledetail.content|safe }}</p>
+    </div>
+    {% csrf_token %}
+    <hr>
+    {% csrf_token %}
+    <!-- 点赞 开始-->
+    <div id="div_digg">
+        <!-- 点赞 -->
+        <div class="diggit digg">
+            <span class="diggnum" id="digg_count">{{ article.up_count }}</span>
+        </div>
+        <!-- 反对 -->
+        <div class="buryit digg">
+            <span class="burynum" id="bury_count">{{ article.down_count }}</span>
+        </div>
+        <div class="clear"></div>
+        <!-- 提示信息 -->
+        <div class="diggword" id="digg_tips"></div>
+    </div>
+    <!-- 点赞 结束-->
+    <div style="height: 150px"></div>
+
+    <!-- 评论展示区 开始-->
+    <h4>评论列表：</h4>
+    <div>
+        <div class="list-group comment-list">
+            {% for comment in comment_list %}
+                <div class="list-group-item list-group-item-info" my-id="{{ comment.id }}">
+                    <h4 class="list-group-item-heading comment-header">
+                        <span># {{ forloop.counter }}楼</span>
+                        <span>{{ comment.create_time|date:'Y-m-d H:i' }}</span>
+                        <span>{{ comment.user.username }}</span>
+                        <span class="pull-right replay">回复</span>
+                    </h4>
+                    {% if comment.parent_comment %}
+                        <span style="display: block">@{{ comment.parent_comment.user.username }}</span>
+                        <p class="list-group-item-text well">
+                            {{ comment.parent_comment.content }}
+                        </p>
+                    {% endif %}
+                    <p class="list-group-item-text comment-content">
+                        {{ comment.content }}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- 评论展示区 结束-->
+    <hr>
+    <!-- 发表评论 开始 -->
+    <h4>发表评论</h4>
+    <div>
+        <span>昵称：</span>
+        <input type="text" value="{{request.user.username}}" disabled>
+    </div>
+    <div>
+        <p>评论内容：</p>
+        <textarea id="new-comment" cols="60" rows="15"></textarea>
+    </div>
+    <div>
+        <button id="submit-comment" class="btn btn-success">提交评论</button>
+    </div>
+    <!-- 发表评论 结束 -->
+
+{% endblock %}
+{% block page-js %}
+    <script>
+        // 给点赞和反对按钮绑定点击事件
+        $(".digg").click(function () {
+            // 1. 先判断有没有登录？
+            console.log('{{ request.user.username }}');
+            if (!'{{ request.user.username }}') {
+
+                location.href = '/login/?next={{ request.get_full_path }}'
+            }
+            // 已经登录可以点赞或反对
+            var userId = '{{ request.user.id }}';
+            var articleId = '{{ article.id }}';
+            // 如何区分是点赞还是反对？
+            var isUp = $(this).hasClass('diggit');
+            // 向后端发请求
+            $.ajax({
+                url: '/updown/',
+                type: 'post',
+                data: {
+                    csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+                    userId: userId,
+                    articleId: articleId,
+                    isUp: isUp
+                },
+                success: function (res) {
+                    console.log(res);
+                    if (res.code !== 0) {
+                        // 只需要把错误提示显示出来就可以
+                        $("#digg_tips").text(res.msg);
+                    } else {
+                        // 1. 先把点赞数或反对数更新一下
+                        if (isUp) {
+                            // 更新点赞数
+                            var $UpSpan = $("#digg_count");
+                            $UpSpan.text(+$UpSpan.text() + 1);
+                        } else {
+                            var $downSpan = $("#bury_count");
+                            $downSpan.text(+$downSpan.text() + 1)
+                        }
+                        // 2. 再显示提示
+                        $("#digg_tips").text(res.msg);
+                    }
+                }
+            })
+        });
+        // 给评论按钮绑定事件
+        $("#submit-comment").click(function () {
+            var userId = "{{request.user.id}}";
+            var content = $("#new-comment").val();
+            var articleId = "{{article.id}}";//这就是在文章详情下边，可以直接写
+            var parentId = $(this).data("pid") || "";
+            if (parentId){
+                content = content.slice(content.indexOf('\n')+1)
+                //进行这个操作的原因是如果有父级评论，会在评论区有一个@，，，的一行，所以切片
+            }
+            $.ajax({
+                url:"/comment/",
+                type:"post",
+                data:{
+                    parent_id :parentId,
+                    user_id:userId,
+                    content:content,
+                    article_id:articleId,
+                    csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val(),
+                },
+                success:function (res) {
+                    console.log(res);
+                    if (res.code ===0){
+                        var data = res.data;
+                        var num = $(".comment-list>div").length+1;//子代选择器，查找的是comment-list下的一个子代元素，共有几个，因为for循环
+                        // 创建评论成功，通过js在评论列表里加一个新的评论,这个模板语言的作用是为了不用刷新就可以提交到页面上
+                        var commentHtml =`
+                      <div href="#" class="list-group-item">
+                            <h4 class="list-group-item-heading comment-header">
+                                <span>${ num }楼</span>
+                                <span>${ data.create_time }</span>
+                                <span>${ data.username }</span>
+                                <span class="pull-right replay">回复</span>
+                            </h4>
+                            <p class="list-group-item-text comment-content">
+                                ${ data.content }
+                            </p>
+                        </div>`;
+                        $(".comment-list").append(commentHtml);
+                        //清空textarea
+                        $("#new-comment").val('');
+                        //这个是清空内容
+                        $("#submit-comment").removeData("pid");
+                        //这个是现在网页如果点击一个父级评论，点击回复会评论一个子评论，
+                        // 但是继续往后编写的话，想要的功能是要父级评论，但是不加这句话仍然是这个父级评论的子评论
+
+                    }
+                }
+            })
+
+        });
+        // 给回复按钮绑定事件,为了
+        {#$(".replay").click(function () {#}
+        $(".comment-list").on("click",".replay",function () {
+             var replayName = $(this).prev().text();
+            //光标聚焦到评论框
+            // 2. 添加一个@xxx的提示
+            $("#new-comment").focus().val("@"+replayName+"\n");
+            // 把当前评论的id值，偷偷存到提交按钮中
+            var pID = $(this).parent().parent().attr("my-id");
+            $("#submit-comment").data("pid",pID);
+
+        });
+
+    </script>
+{% endblock %}
